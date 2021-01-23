@@ -1,6 +1,6 @@
 from netmiko import ConnectHandler
 import logging
-logging.basicConfig(filename='test.log', level=logging.DEBUG)
+logging.basicConfig(filename='test.log', level=logging.INFO)
 loger = logging.getLogger("netmiko")
 
 tplink_t1600 = {
@@ -16,8 +16,8 @@ connection = ConnectHandler(**tplink_t1600)
 # getting the router's prompt
 prompt = connection.find_prompt()
 print(prompt)
-# if '>' in prompt:
-#     connection.enable(cmd='enable-admin')  # entering the enable mode
+if '>' in prompt:
+     connection.enable()  # entering the enable mode
 
 output = connection.send_command('show mac-vlan all')
 print(output)
@@ -26,13 +26,19 @@ if not connection.check_config_mode():  # returns True if it's already in the gl
     connection.config_mode()  # entering the global config mode
 
 print(connection.check_config_mode())
-connection.send_command('user name u6 password cisco')
-# connection.send_command('save')
+cmd = 'mac-vlan mac-address 00:1F:85:FB:63:35 vlan 4 description faitmac'
+connection.send_command(cmd)
+# output = connection.send_command('user name u6 password cisco')
+print(output)
 
 connection.exit_config_mode()  # exiting the global config mode
 print(connection.check_config_mode())
 # yapiseme
+
 output = connection.send_command('copy running-config startup-config')
+print(output)
+
+output = connection.send_command('show mac-vlan all')
 print(output)
 
 print('Closing connection')
